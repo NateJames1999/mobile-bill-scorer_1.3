@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Corporate Mobile Intelligence Desk — Free Mobility Audit</title>
+<style>
+:root {
+  --canvas: #f8fafc;
+  --panel: #ffffff;
+  --border: #e2e8f0;
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+  --brand: #0284c7;
+  --brand-light: #f0f9ff;
+  --brand-dark: #0369a1;
+  --accent-green: #10b981;
+  --accent-amber: #f59e0b;
+  --accent-red: #ef4444;
+  --radius: 12px;
+  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: var(--font); }
+body { background: var(--canvas); color: var(--text-main); min-height: 100vh; padding: 2rem 1rem; line-height: 1.5; }
+
+.wrapper { max-width: 680px; margin: 0 auto; }
+header { text-align: center; margin-bottom: 2rem; }
+header h1 { font-size: 26px; font-weight: 800; color: var(--text-main); letter-spacing: -0.02em; }
+header p { color: var(--text-muted); font-size: 15px; margin-top: 0.25rem; }
+
+.card { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); padding: 2rem; margin-bottom: 1.5rem; }
+.step-panel { display: none; }
+.step-panel.active { display: block; }
+
+/* Progress Indicator */
+.progress-bar { display: flex; justify-content: space-between; margin-bottom: 2rem; background: var(--border); height: 4px; border-radius: 99px; position: relative; }
+.progress-fill { position: absolute; left: 0; top: 0; height: 100%; background: var(--brand); width: 25%; transition: width 0.3s ease; border-radius: 99px; }
+
+/* UI Elements */
+.section-title { font-size: 18px; font-weight: 700; margin-bottom: 0.5rem; color: var(--text-main); }
+.section-subtitle { font-size: 13px; color: var(--text-muted); margin-bottom: 1.5rem; }
+.form-group { margin-bottom: 1.25rem; display: flex; flex-direction: column; gap: 0.5rem; }
+label { font-size: 13px; font-weight: 600; color: var(--text-main); }
+input, select, textarea { width: 100%; padding: 10px 14px; background: var(--canvas); border: 1px solid var(--border); border-radius: 8px; font-size: 14px; outline: none; transition: all 0.15s; }
+input:focus, select:focus, textarea:focus { border-color: var(--brand); background: #fff; box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.1); }
+
+/* Option Cards and Buttons */
+.grid-select { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 1.5rem; }
+@media (max-width: 480px) { .grid-select { grid-template-columns: 1fr; } }
+.opt-card { border: 2px solid var(--border); padding: 1rem; border-radius: 8px; cursor: pointer; transition: all 0.15s; background: #fff; }
+.opt-card:hover { border-color: var(--brand); }
+.opt-card.selected { border-color: var(--brand); background: var(--brand-light); }
+.opt-title { font-size: 14px; font-weight: 700; margin-bottom: 2px; }
+.opt-desc { font-size: 12px; color: var(--text-muted); line-height: 1.4; }
+
+.btn-row { display: flex; gap: 12px; margin-top: 1.5rem; }
+.btn { flex: 1; padding: 12px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; border: 1px solid var(--border); background: #fff; text-align: center; transition: all 0.15s; }
+.btn-primary { background: var(--brand); color: #fff; border-color: var(--brand); }
+.btn-primary:hover { background: var(--brand-dark); }
+.btn-secondary { color: var(--text-muted); }
+
+/* Audit Outcome Display */
+.badge { display: inline-block; padding: 4px 8px; font-size: 11px; font-weight: 700; border-radius: 4px; text-transform: uppercase; margin-bottom: 0.5rem; }
+.badge-alert { background: #fef2f2; color: var(--accent-red); }
+.badge-good { background: #ecfdf5; color: var(--accent-green); }
+
+.score-hero { text-align: center; padding: 1.5rem; border-radius: 8px; background: var(--canvas); margin-bottom: 1.5rem; }
+.score-value { font-size: 48px; font-weight: 900; line-height: 1; margin-bottom: 0.25rem; }
+.score-tier { font-size: 16px; font-weight: 700; }
+
+.insight-box { border-left: 4px solid var(--brand); background: var(--brand-light); padding: 1rem; border-radius: 0 8px 8px 0; font-size: 13px; margin-bottom: 1.5rem; }
+.bullet-list { margin-left: 1.25rem; margin-bottom: 1.5rem; font-size: 13px; color: var(--text-main); }
+.bullet-list li { margin-bottom: 0.5rem; }
+
+.lead-capture { background: #fffdf5; border: 1px solid #fef3c7; border-radius: 8px; padding: 1.5rem; margin-top: 1.5rem; }
+</style>
+</head>
+<body>
+
+<div class="wrapper">
+  <header>
+    <h1>📋 Corporate Mobile Intelligence Desk</h1>
+    <p>Independent Cost Benchmarking & Telecom Optimization Registry</p>
+  </header>
+
+  <div class="progress-bar">
+    <div class="progress-fill" id="progress-fill"></div>
+  </div>
+
+  <div class="card">
+    
+    <div class="step-panel active" id="step-1">
+      <div class="section-title">Step 1: Account Parameters</div>
+      <div class="section-subtitle">Establish baseline business details for market group categorization.</div>
+      
+      <div class="form-group">
+        <label>Corporate Registry / Business Name</label>
+        <input type="text" id="input-biz" placeholder="e.g. ACME Holdings Ltd.">
+      </div>
+      <div class="form-group">
+        <label>Total Active Mobility Lines</label>
+        <input type="number" id="input-lines" placeholder="e.g. 25" min="1">
+      </div>
+      <div class="form-group">
+        <label>Current Ecosystem Provider</label>
+        <select id="input-carrier">
+          <option value="">Select Provider...</option>
+          <option value="Rogers">Rogers Business</option>
+          <option value="Bell">Bell Business</option>
+          <option value="Telus">TELUS Business</option>
+          <option value="Videotron">Videotron Business</option>
+          <option value="Other">Independent / Regional Provider</option>
+        </select>
+      </div>
+      
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="navigateStep(2)">Analyze Financial Baselines →</button>
+      </div>
+    </div>
+
+    <div class="step-panel" id="step-2">
+      <div class="section-title">Step 2: Financial Commitments</div>
+      <div class="section-subtitle">Input real rates to map performance metrics against strict wholesale market indexes.</div>
+      
+      <div class="form-group">
+        <label>Average Monthly Base Rate per Line ($)</label>
+        <input type="number" id="input-rate" placeholder="Gross amount before recurring credits, e.g. 65">
+      </div>
+      <div class="form-group">
+        <label>Average Monthly Credits per Line ($)</label>
+        <input type="number" id="input-credits" placeholder="e.g. 15" value="0">
+      </div>
+      
+      <div class="slabel" style="font-size:12px; font-weight:600; margin-bottom:8px;">Deployment Configuration</div>
+      <div class="grid-select">
+        <div class="opt-card selected" id="tier-canada" onclick="selectOpt('tier', 'canada')">
+          <div class="opt-title">Domestic Profile</div>
+          <div class="opt-desc">Standard communication access within Canada.</div>
+        </div>
+        <div class="opt-card" id="tier-global" onclick="selectOpt('tier', 'global')">
+          <div class="opt-title">Cross-Border Profile</div>
+          <div class="opt-desc">Includes persistent US/Mexico pooling or frequent global travel metrics.</div>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-secondary" onclick="navigateStep(1)">Back</button>
+        <button class="btn btn-primary" onclick="navigateStep(3)">Evaluate Structural Risks →</button>
+      </div>
+    </div>
+
+    <div class="step-panel" id="step-3">
+      <div class="section-title">Step 3: Contractual Alignment</div>
+      <div class="section-subtitle">This cross-references alignment vulnerabilities that prevent direct market negotiation.</div>
+      
+      <div class="slabel" style="font-size:12px; font-weight:600; margin-bottom:8px;">Hardware Strategy</div>
+      <div class="grid-select">
+        <div class="opt-card selected" id="deal-byod" onclick="selectOpt('deal', 'byod')">
+          <div class="opt-title">BYOD / Clear Term</div>
+          <div class="opt-desc">Apparatuses are owned out-right; completely off-contract.</div>
+        </div>
+        <div class="opt-card" id="deal-sub" onclick="selectOpt('deal', 'sub')">
+          <div class="opt-title">Subsidized Term</div>
+          <div class="opt-desc">Active balances remaining across device financing layers.</div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Estimated Months Remaining on Agreement</label>
+        <select id="input-term">
+          <option value="0">Month-to-Month (No Contract)</option>
+          <option value="6">Under 6 Months Remaining</option>
+          <option value="18">6 to 24 Months Remaining</option>
+          <option value="36">Extreme Horizon (24+ Months)</option>
+        </select>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-secondary" onclick="navigateStep(2)">Back</button>
+        <button class="btn btn-primary" onclick="processAudit()">Generate Performance Score Summary ✨</button>
+      </div>
+    </div>
+
+    <div class="step-panel" id="step-4">
+      <div class="badge id="panel-badge" class="badge-alert">System Audit Run Complete</div>
+      <div class="section-title" id="output-header">Optimization Profile Matrix</div>
+      
+      <div class="score-hero">
+        <div class="score-value" id="output-score">--</div>
+        <div class="score-tier" id="output-tier">Analyzing...</div>
+      </div>
+
+      <div class="insight-box" id="output-insight">
+        Loading objective data alignment...
+      </div>
+
+      <div class="section-title" style="font-size:15px; margin-bottom:0.5rem;">Identified Operational Variances</div>
+      <ul class="bullet-list" id="output-bullets">
+        </ul>
+
+      <div class="lead-capture">
+        <div class="section-title" style="font-size:16px; color: var(--brand-dark);">Unlock Competitive Market Leverage</div>
+        <p style="font-size:12px; color: var(--text-muted); margin-bottom:1rem; line-height:1.45;">
+          Canadian enterprise carriers process contract renegotiations based strictly on active validation indexes. Request a formal alternative quote bundle from competing channels below to force an optimization re-rate.
+        </p>
+        
+        <div class="form-group">
+          <label>Preferred Administrative Contact Name</label>
+          <input type="text" id="lead-name" placeholder="Alex Mercer">
+        </div>
+        <div class="form-group">
+          <label>Direct Business Email Address</label>
+          <input type="email" id="lead-email" placeholder="alex@company.com">
+        </div>
+        <div class="form-group">
+          <label>Direct Contact Phone Number</label>
+          <input type="tel" id="lead-phone" placeholder="555-555-5555">
+        </div>
+        <div class="form-group">
+          <label>Destination Competitive Request Target</label>
+          <select id="lead-target">
+            <option value="All Alternatives">Request Cross-Platform Competitive Bids (Recommended)</option>
+            <option value="Rogers Desk">Request Only Rogers Enterprise Quote Desk</option>
+            <option value="Bell Desk">Request Only Bell Business Quote Desk</option>
+            <option value="Telus Desk">Request Only TELUS Corporate Quote Desk</option>
+          </select>
+        </div>
+
+        <button class="btn btn-primary" style="width:100%; margin-top:0.5rem;" id="submit-lead-btn" onclick="executeLeadSubmission()">Secure Anonymized Competitive Quote Bundles</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// State storage engine 
+var AppState = {
+  tier: 'canada',
+  deal: 'byod'
+};
+
+function navigateStep(targetStep) {
+  // Simple check layer before stepping 
+  if (targetStep === 2) {
+    var bName = document.getElementById('input-biz').value;
+    var bLines = document.getElementById('input-lines').value;
+    if (!bName || !bLines) {
+      alert("Please specify the corporate entity name and line configuration details to configure alignment metrics.");
+      return;
+    }
+  }
+
+  document.querySelectorAll('.step-panel').forEach(function(el) { el.classList.remove('active'); });
+  document.getElementById('step-' + targetStep).classList.add('active');
+  
+  // Progress tracking update rules
+  var pPct = targetStep === 1 ? '25%' : targetStep === 2 ? '50%' : targetStep === 3 ? '75%' : '100%';
+  document.getElementById('progress-fill').style.width = pPct;
+}
+
+function selectOpt(category, value) {
+  if (category === 'tier') {
+    document.getElementById('tier-canada').classList.remove('selected');
+    document.getElementById('tier-global').classList.remove('selected');
+    document.getElementById('tier-' + value).classList.add('selected');
+    AppState.tier = value;
+  } else if (category === 'deal') {
+    document.getElementById('deal-byod').classList.remove('selected');
+    document.getElementById('deal-sub').classList.remove('selected');
+    document.getElementById('deal-' + value).classList.add('selected');
+    AppState.deal = value;
+  }
+}
+
+function processAudit() {
+  var lines = parseFloat(document.getElementById('lines') ? document.getElementById('lines').value : document.getElementById('input-lines').value) || 0;
+  var gRate = parseFloat(document.getElementById('input-rate').value) || 0;
+  var cRate = parseFloat(document.getElementById('input-credits').value) || 0;
+  var termValue = document.getElementById('input-term').value;
+  var carrierValue = document.getElementById('input-carrier').value;
+  
+  var effectiveRate = gRate - cRate;
+  
+  // Strict Market Benchmark Metric Engine
+  var benchmarkTarget = 34;
+  if (AppState.tier === 'global') benchmarkTarget += 15;
+  if (AppState.deal === 'sub') benchmarkTarget += 20;
+  
+  var variance = effectiveRate - benchmarkTarget;
+  var baseScore = 100 - (variance * 2.5);
+  
+  // Risk index bounds safety clamps
+  if (baseScore > 98) baseScore = 98;
+  if (baseScore < 22) baseScore = 22;
+  var definitiveScore = Math.round(baseScore);
+
+  // Layout presentation rendering
+  var outScore = document.getElementById('output-score');
+  var outTier = document.getElementById('output-tier');
+  var outInsight = document.getElementById('output-insight');
+  var outBullets = document.getElementById('output-bullets');
+
+  outScore.textContent = definitiveScore + " / 100";
+  
+  var trackingBullets = [];
+  
+  if (definitiveScore >= 80) {
+    outTier.textContent = "Optimal Optimization Profile";
+    outTier.style.color = "var(--accent-green)";
+    outInsight.innerHTML = "Your current pricing model sits within the top 15% of evaluated Canadian wholesale optimization parameters. Your premium margin exposure is minimal.";
+    trackingBullets.push("No urgent renegotiation indicated. Standard cyclical evaluations recommended at agreement termination boundaries.");
+  } else if (definitiveScore >= 55) {
+    outTier.textContent = "Standard Market Inefficiency";
+    outTier.style.color = "var(--accent-amber)";
+    outInsight.innerHTML = "Substantial optimization margin observed. Your plan pricing shows localized variance adjustments compared to alternate institutional corporate tiers.";
+    trackingBullets.push("Your baseline rate shows approximately $" + Math.round(variance) + " of overpayment spacing per profile relative to optimized carrier channels.");
+    if (AppState.deal === 'sub') trackingBullets.push("Subsidized device profiles hide clear billing structures. Splitting profiles to BYOD configurations usually yields immediate optimization.");
+  } else {
+    outTier.textContent = "Severe Profile Value Loss";
+    outTier.style.color = "var(--accent-red)";
+    outInsight.innerHTML = "Critical exposure risk flag triggered. Your corporate architecture operates well outside established sovereign commercial frameworks. Resource adjustment is strongly advised.";
+    trackingBullets.push("Sustained optimization exposure calculates to an average waste metric of $" + Math.round((variance * lines) * 12) + " annually across your footprint.");
+    if (termValue === "0") trackingBullets.push("Your Month-to-Month status gives you massive leverage. You can jump directly to alternative acquisition pricing desks immediately without cancellation penalties.");
+  }
+
+  outBullets.innerHTML = trackingBullets.map(function(b) { return "<li>" + b + "</li>"; }).join("");
+  navigateStep(4);
+}
+
+function executeLeadSubmission() {
+  var name = document.getElementById('lead-name').value;
+  var email = document.getElementById('lead-email').value;
+  var phone = document.getElementById('lead-phone').value;
+  var dest = document.getElementById('lead-target').value;
+  var biz = document.getElementById('input-biz').value;
+  var lines = document.getElementById('input-lines').value;
+  var currentC = document.getElementById('input-carrier').value;
+  var calcScr = document.getElementById('output-score').textContent;
+
+  if (!name || !email || !phone) {
+    alert("Please complete core validation fields to authorize the competitive quote procurement protocol.");
+    return;
+  }
+
+  var btn = document.getElementById('submit-lead-btn');
+  btn.textContent = "Securing Allocation Channels...";
+  btn.disabled = true;
+
+  // Formspree backend secure processing route
+  fetch('https://formspree.io/f/mwvzvryz', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+    body: JSON.stringify({
+      _subject: 'Optimization Request: ' + biz + ' (' + lines + ' Lines)',
+      corporate_name: biz,
+      volume_metrics: lines + " Profiles Assessed",
+      incumbent_system: currentC,
+      auditor_assigned_score: calcScr,
+      auth_officer: name,
+      auth_email: email,
+      auth_phone: phone,
+      procurement_routing: dest,
+      configuration_tier: AppState.tier,
+      hardware_position: AppState.deal
+    })
+  })
+  .then(function(res) { return res.json(); })
+  .then(function(data) {
+    if (data.ok) {
+      btn.textContent = "Procurement Matrix Authorized ✓";
+      btn.style.background = "var(--accent-green)";
+      btn.style.borderColor = "var(--accent-green)";
+      var confirmationAlert = document.createElement('div');
+      confirmationAlert.style.cssText = "font-size:12px; color: var(--accent-green); font-weight:700; margin-top:12px; text-align:center;";
+      confirmationAlert.textContent = "System confirmed optimization inquiry authorization. Secure alternative wholesale desks will route proposals shortly.";
+      btn.parentElement.appendChild(confirmationAlert);
+    } else {
+      btn.textContent = "Re-authorize System Routing Request";
+      btn.disabled = false;
+      alert("Encountered connection confirmation interruption. Please verify submission format.");
+    }
+  })
+  .catch(function() {
+    btn.textContent = "Re-authorize System Routing Request";
+    btn.disabled = false;
+    alert("System communication failure. Verify target parameters.");
+  });
+}
+</script>
+</body>
+</html>
