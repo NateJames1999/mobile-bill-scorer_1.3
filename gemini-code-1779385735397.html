@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mobile Bill Score — Free Business Mobility Audit</title>
+<meta name="description" content="Find out if your business is overpaying for mobile. Free instant grade on your current plan.">
+<style>
+:root{--bg:#f7f7f5;--bg2:#efefec;--border:#ddddd8;--border2:#c5c5be;--text:#1a1a18;--text2:#555550;--text3:#999992;--blue:#0C447C;--blue-light:#e8f0f8;--green:#0F6E56;--amber:#BA7517;--orange:#D85A30;--red:#A32D2D;--radius:12px;--radius-sm:7px;--shadow:0 1px 4px rgba(0,0,0,0.07),0 4px 16px rgba(0,0,0,0.05);}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+.page-header{background:var(--text);color:#fff;padding:1.5rem 1.25rem 1.25rem;text-align:center;}
+.page-header h1{font-size:22px;font-weight:700;margin-bottom:4px;}
+.page-header p{font-size:14px;color:rgba(255,255,255,0.55);max-width:480px;margin:0 auto;}
+.container{max-width:700px;margin:0 auto;padding:1.25rem 1rem 5rem;}
+.path-selector{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1.5rem;}
+.path-card{background:#fff;border:2px solid var(--border);border-radius:var(--radius);padding:1.1rem 1rem;cursor:pointer;transition:all 0.18s;}
+.path-card:hover{border-color:var(--blue);}
+.path-card.active{border-color:var(--blue);background:var(--blue-light);}
+.path-card-icon{font-size:22px;margin-bottom:6px;}
+.path-card-title{font-size:14px;font-weight:600;margin-bottom:3px;}
+.path-card-sub{font-size:12px;color:var(--text3);line-height:1.45;}
+@media(max-width:480px){.path-selector{grid-template-columns:1fr;}}
+
+/* Live Score Banner at Top */
+.live-score-banner {background:#fff; border:2px dashed var(--border); border-radius:var(--radius); padding:1.25rem; margin-bottom:1.5rem; display:flex; align-items:center; justify-content:center; gap:1.5rem; text-align:left; box-shadow:var(--shadow);}
+.live-score-banner.calculated {border-style:solid; border-color:var(--blue);}
+.ls-circle {width:70px; height:70px; border-radius:50%; border:3px solid #ccc; display:flex; flex-direction:column; align-items:center; justify-content:center; flex-shrink:0; background:var(--bg);}
+.ls-num {font-size:22px; font-weight:700; line-height:1;}
+.ls-letter {font-size:14px; font-weight:600; line-height:1; margin-top:2px;}
+.ls-meta {flex:1;}
+.ls-title {font-size:15px; font-weight:700; margin-bottom:2px;}
+.ls-status {font-size:13px; color:var(--text2); line-height:1.4;}
+
+.card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);margin-bottom:1rem;box-shadow:var(--shadow);overflow:hidden;}
+.card-header{display:flex;align-items:center;justify-content:space-between;padding:1rem 1.25rem;cursor:pointer;user-select:none;}
+.card-left{display:flex;align-items:center;gap:10px;}
+.card-num{width:24px;height:24px;border-radius:50%;background:var(--text);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;}
+.card-title{font-size:14px;font-weight:600;}
+.card-sub{font-size:12px;color:var(--text3);margin-top:1px;}
+.chevron{font-size:18px;color:var(--text3);transition:transform 0.2s;line-height:1;display:inline-block;}
+.chevron.open{transform:rotate(180deg);}
+.card-body{padding:0 1.25rem 1.25rem;display:none;}
+.card-body.open{display:block;}
+.opt-badge{font-size:10px;background:var(--bg2);color:var(--text2);padding:2px 7px;border-radius:99px;margin-left:6px;font-weight:500;}
+.req-badge{font-size:10px;background:var(--blue-light);color:var(--blue);padding:2px 7px;border-radius:99px;margin-left:6px;font-weight:500;}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
+.field-row.three{grid-template-columns:1fr 1fr 1fr;}
+@media(max-width:540px){.field-row,.field-row.three{grid-template-columns:1fr;}}
+.fg{display:flex;flex-direction:column;gap:4px;}
+label{font-size:12px;color:var(--text2);font-weight:500;line-height:1.4;}
+.hint{font-size:11px;color:var(--text3);margin-top:2px;font-style:italic;line-height:1.4;}
+input,select,textarea{width:100%;font-size:14px;color:var(--text);background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 10px;outline:none;transition:border-color 0.15s;font-family:inherit;}
+input:focus,select:focus,textarea:focus{border-color:var(--blue);background:#fff;}
+textarea{resize:vertical;min-height:64px;}
+.slabel{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px;margin-top:4px;}
+.divider{height:1px;background:var(--border);margin:14px 0;}
+.pill-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;}
+.pill{font-size:12px;padding:5px 14px;border-radius:99px;border:1px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer;transition:all 0.15s;font-family:inherit;}
+.pill:hover{border-color:var(--blue);color:var(--blue);}
+.pill.sel{background:var(--blue);border-color:var(--blue);color:#fff;font-weight:500;}
+.etf-box{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;margin-top:8px;}
+.etf-title{font-size:11px;font-weight:600;color:var(--text2);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.05em;}
+.etf-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px;}
+@media(max-width:540px){.etf-row{grid-template-columns:1fr;}}
+.etf-res{font-size:13px;color:var(--text);padding-top:8px;border-top:1px solid var(--border);}
+.etf-res strong{color:var(--blue);}
+.etf-formula{font-size:11px;color:var(--text3);margin-top:3px;font-style:italic;}
+.info-box{background:var(--blue-light);border-left:3px solid var(--blue);border-radius:0 var(--radius-sm) var(--radius-sm) 0;padding:10px 12px;margin-bottom:12px;font-size:13px;color:var(--text2);line-height:1.55;}
+.info-box strong{color:var(--text);}
+.warn-box{background:#fff3e0;border-left:3px solid var(--orange);border-radius:0 var(--radius-sm) var(--radius-sm) 0;padding:10px 12px;font-size:13px;color:#7a3010;line-height:1.55;display:none;margin-top:10px;}
+.result-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;margin-bottom:1rem;box-shadow:var(--shadow);}
+.score-top{display:flex;align-items:flex-start;gap:1.25rem;margin-bottom:1.25rem;flex-wrap:wrap;}
+.score-circle{width:88px;height:88px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;border:3px solid #ccc;transition:border-color 0.3s;}
+.sc-num{font-size:28px;font-weight:700;line-height:1;}
+.sc-letter{font-size:17px;font-weight:600;line-height:1;margin-top:2px;}
+.score-meta{flex:1;min-width:160px;}
+.sc-biz{font-size:15px;font-weight:600;}
+.sc-desc{font-size:13px;color:var(--text2);margin-top:5px;line-height:1.55;}
+.conf-wrap{margin-top:10px;}
+.conf-head{display:flex;justify-content:space-between;margin-bottom:3px;}
+.conf-head span{font-size:11px;color:var(--text3);}
+.conf-bg{height:5px;background:var(--bg2);border-radius:99px;}
+.conf-bar{height:5px;border-radius:99px;background:var(--blue);transition:width 0.4s;}
+.conf-note{font-size:11px;color:var(--text3);margin-top:3px;}
+.cat-row{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px;}
+.cat-row:last-child{border-bottom:none;}
+.cat-name{flex:1;}
+.cat-detail{font-size:11px;color:var(--text3);margin-top:1px;}
+.cat-bg{width:70px;height:5px;background:var(--bg2);border-radius:99px;flex-shrink:0;}
+.cat-fill{height:5px;border-radius:99px;}
+.cat-pts{font-size:12px;color:var(--text3);min-width:48px;text-align:right;}
+.cat-grade{font-size:12px;font-weight:700;min-width:18px;text-align:right;}
+.skipped{color:var(--text3);font-style:italic;}
+.finding{display:flex;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);font-size:13px;align-items:flex-start;line-height:1.5;}
+.finding:last-child{border-bottom:none;}
+.carrier-card{background:var(--bg2);border-radius:var(--radius-sm);padding:10px 12px;margin-bottom:8px;}
+.carrier-name{font-size:13px;font-weight:600;margin-bottom:4px;}
+.carrier-info{font-size:12px;color:var(--text2);line-height:1.7;}
+.carrier-info a{color:var(--blue);text-decoration:none;}
+.btn{font-size:13px;padding:9px 18px;border-radius:var(--radius-sm);border:1px solid var(--border2);background:transparent;color:var(--text);cursor:pointer;font-family:inherit;transition:all 0.15s;}
+.btn-primary{background:var(--blue);border-color:var(--blue);color:#fff;font-size:14px;padding:12px 22px;}
+.btn-primary:hover{background:#0a3868;}
+.btn-full{width:100%;font-size:15px;padding:14px;}
+.upgrade-card{text-align:center;padding:1.5rem;}
+.page-footer{text-align:center;padding:2rem 1rem;font-size:11px;color:var(--text3);border-top:1px solid var(--border);margin-top:1rem;line-height:1.6;}
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>📋 Mobile Bill Score</h1>
+  <p>Find out if your business is overpaying for mobile. Free, instant, no obligation.</p>
+</div>
+
+<div class="container">
+
+<div style="margin-bottom:1rem;">
+  <div class="slabel">How would you like to start?</div>
+  <div class="path-selector">
+    <div class="path-card active" id="path-a-card" onclick="setPath('a')">
+      <div class="path-card-icon">⚡</div>
+      <div class="path-card-title">Quick check (60s)</div>
+      <div class="path-card-sub">I know roughly what I pay and how many lines I have. Simple & fast.</div>
+    </div>
+    <div class="path-card" id="path-b-card" onclick="setPath('b')">
+      <div class="path-card-icon">📄</div>
+      <div class="path-card-title">Full audit</div>
+      <div class="path-card-sub">I have my bill handy and want to review contracts, device subsidies & data rules.</div>
+    </div>
+  </div>
+</div>
+
+<div class="live-score-banner" id="live-score-banner">
+  <div class="ls-circle" id="ls-circle">
+    <span class="ls-num" id="ls-num">--</span>
+    <span class="ls-letter" id="ls-letter">-</span>
+  </div>
+  <div class="ls-meta">
+    <div class="ls-title" id="ls-title">Your Mobile Bill Grade</div>
+    <div class="ls-status" id="ls-status">Enter your line numbers and monthly rate below to instantly view your score.</div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header" onclick="tog('s1')">
+    <div class="card-left"><div class="card-num">1</div><div><div class="card-title">Business info <span class="req-badge">Required</span></div><div class="card-sub">Who is this audit for?</div></div></div>
+    <span class="chevron open" id="chev-s1">⌄</span>
+  </div>
+  <div class="card-body open" id="body-s1">
+    <div class="field-row">
+      <div class="fg"><label>Business name</label><input type="text" id="biz-name" placeholder="ACME Inc." oninput="calc()"></div>
+      <div class="fg"><label>Contact name</label><input type="text" id="contact-name" placeholder="Jane Smith"></div>
+    </div>
+    <div class="field-row">
+      <div class="fg"><label>Email</label><input type="email" id="contact-email" placeholder="jane@acme.com"></div>
+      <div class="fg"><label>Phone</label><input type="tel" id="contact-phone" placeholder="604-555-0100"></div>
+    </div>
+    <div class="field-row">
+      <div class="fg"><label>Current carrier</label>
+        <select id="carrier" onchange="calc()"><option value="">Select carrier</option><option>Rogers</option><option>Bell</option><option>Fido Business</option><option>Koodo Business</option><option>Telus</option><option>Videotron</option><option>Shaw Mobile</option><option>Other</option></select>
+      </div>
+      <div class="fg"><label>Industry</label>
+        <select id="industry"><option value="">Select industry</option><option>Construction / Trades</option><option>Real Estate</option><option>Property Management</option><option>Transportation / Logistics</option><option>Healthcare</option><option>Professional Services</option><option>Retail</option><option>Hospitality</option><option>Technology</option><option>Other</option></select>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header" onclick="tog('s2')">
+    <div class="card-left"><div class="card-num">2</div><div><div class="card-title">Plan basics <span class="req-badge">Required</span></div><div class="card-sub">Lines, rate and coverage</div></div></div>
+    <span class="chevron open" id="chev-s2">⌄</span>
+  </div>
+  <div class="card-body open" id="body-s2">
+    <div class="field-row three">
+      <div class="fg"><label>Total lines</label><input type="number" id="lines" placeholder="e.g. 30" min="1" oninput="calc()"></div>
+      <div class="fg"><label>Monthly rate per line ($)</label><input type="number" id="rate" placeholder="e.g. 50" min="0" oninput="calc()"></div>
+      <div class="fg"><label>Monthly credits per line ($)</label><input type="number" id="credits" placeholder="e.g. 4" min="0" oninput="calc()"></div>
+    </div>
+    <div class="slabel">Coverage tier</div>
+    <div class="pill-row">
+      <button class="pill sel" onclick="selPill('tier',this,'canada')">Canada-wide</button>
+      <button class="pill" onclick="selPill('tier',this,'can-us')">Can-US</button>
+      <button class="pill" onclick="selPill('tier',this,'can-us-mex')">Can-US-Mex</button>
+      <button class="pill" onclick="selPill('tier',this,'global')">Global</button>
+      <button class="pill" onclick="selPill('tier',this,'mixed')">Mixed</button>
+    </div>
+    <div class="slabel">Deal type</div>
+    <div class="pill-row">
+      <button class="pill sel" onclick="selPill('deal',this,'byod')">BYOD</button>
+      <button class="pill" onclick="selPill('deal',this,'mtm')">Month-to-month</button>
+      <button class="pill" onclick="selPill('deal',this,'2yr')">2-year</button>
+      <button class="pill" onclick="selPill('deal',this,'3yr')">3-year</button>
+    </div>
+  </div>
+</div>
+
+<div class="card path-b" style="display:none;">
+  <div class="card-header" onclick="tog('s3')">
+    <div class="card-left"><div class="card-num">3</div><div><div class="card-title">Data plan <span class="opt-badge">Optional</span></div><div class="card-sub">GB allowance and usage patterns</div></div></div>
+    <span class="chevron" id="chev-s3">⌄</span>
+  </div>
+  <div class="card-body" id="body-s3">
+    <div class="field-row">
+      <div class="fg"><label>Data per line (GB)</label><input type="number" id="data-gb" placeholder="e.g. 20" min="0" oninput="calc()"></div>
+      <div class="fg"><label>Total overages on bill ($)</label><input type="number" id="overages" placeholder="e.g. 0" min="0" oninput="calc()"></div>
+    </div>
+    <div class="slabel">Data structure</div>
+    <div class="pill-row">
+      <button class="pill" onclick="selPill('data',this,'shared')">Shareable / pooled</button>
+      <button class="pill" onclick="selPill('data',this,'individual')">Individual per line</button>
+      <button class="pill sel" onclick="selPill('data',this,'unknown')">Not sure</button>
+    </div>
+  </div>
+</div>
+
+<div class="card path-b" style="display:none;">
+  <div class="card-header" onclick="tog('s4')">
+    <div class="card-left"><div class="card-num">4</div><div><div class="card-title">Contract terms <span class="opt-badge">Optional</span></div><div class="card-sub">Term length and cancellation costs</div></div></div>
+    <span class="chevron" id="chev-s4">⌄</span>
+  </div>
+  <div class="card-body" id="body-s4">
+    <div class="field-row three">
+      <div class="fg"><label>Contract start date</label><input type="month" id="contract-start" oninput="calcRem()"></div>
+      <div class="fg"><label>Contract length</label>
+        <select id="contract-len" onchange="calcRem()"><option value="">Select</option><option value="12">1 year</option><option value="24">2 years</option><option value="36">3 years</option><option value="0">Month-to-month</option></select>
+      </div>
+      <div class="fg"><label>Months remaining (auto)</label><input type="number" id="months-left" placeholder="Auto-calculated" min="0" oninput="calc()"></div>
+    </div>
+    <div class="field-row">
+      <div class="fg">
+        <label>Early Transfer / Cancellation Fees — total across all lines ($)</label>
+        <input type="number" id="etf" placeholder="e.g. 616" min="0" oninput="calc()">
+        <div class="etf-box">
+          <div class="etf-title">ETF estimator — don't know your total?</div>
+          <div class="etf-row">
+            <div class="fg"><label>Monthly plan discount per line ($)</label><div class="hint">e.g. $65 plan billed at $46 = $19/mo discount</div><input type="number" id="etf-credits" placeholder="e.g. 19" min="0" oninput="calcETF()"></div>
+            <div class="fg"><label>Contract length (months)</label><input type="number" id="etf-len" placeholder="e.g. 36" min="1" oninput="calcETF()"></div>
+            <div class="fg"><label>Months remaining</label><input type="number" id="etf-rem" placeholder="e.g. 6" min="0" oninput="calcETF()"></div>
+          </div>
+          <div class="etf-res" id="etf-result" style="display:none;">Per line: <strong id="etf-per-line">--</strong> &nbsp;·&nbsp; Total across <strong id="etf-line-count">--</strong> lines: <strong id="etf-total">--</strong><div class="etf-formula">Formula: monthly plan discount × months remaining = ETF per line</div></div>
+        </div>
+      </div>
+      <div class="fg"><label>Orphaned lines on separate contracts</label>
+        <select id="orphans" onchange="calc()"><option value="0">None</option><option value="1">1 line</option><option value="2">2–3 lines</option><option value="3">4+ lines</option></select>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card path-b" style="display:none;">
+  <div class="card-header" onclick="tog('s5')">
+    <div class="card-left"><div class="card-num">5</div><div><div class="card-title">Devices <span class="opt-badge">Optional</span></div><div class="card-sub">Only scored on lines with subsidized devices</div></div></div>
+    <span class="chevron" id="chev-s5">⌄</span>
+  </div>
+  <div class="card-body" id="body-s5">
+    <div class="field-row three">
+      <div class="fg"><label>Lines with subsidized devices</label><input type="number" id="dev-lines" placeholder="e.g. 4" min="0" oninput="calc()"></div>
+      <div class="fg"><label>Device base price ($)</label><input type="number" id="dev-price" placeholder="e.g. 1300" min="0" oninput="calc()"></div>
+      <div class="fg"><label>Subsidy per device ($)</label><input type="number" id="dev-subsidy" placeholder="e.g. 300" min="0" oninput="calc()"></div>
+    </div>
+    <div style="font-size:12px;color:var(--text3);margin-top:8px;">$300+ = strong &nbsp;·&nbsp; $200–$299 = fair &nbsp;·&nbsp; under $200 = room to improve</div>
+  </div>
+</div>
+
+<div class="card path-b" style="display:none;">
+  <div class="card-header" onclick="tog('s6')">
+    <div class="card-left"><div class="card-num">6</div><div><div class="card-title">Support <span class="opt-badge">Optional</span></div><div class="card-sub">How you interact with your carrier today</div></div></div>
+    <span class="chevron" id="chev-s6">⌄</span>
+  </div>
+  <div class="card-body" id="body-s6">
+    <div class="slabel">Your current support arrangement</div>
+    <div class="pill-row">
+      <button class="pill sel" onclick="selPill('support',this,'unknown')">Not sure</button>
+      <button class="pill" onclick="selPill('support',this,'proactive')">Proactive dedicated rep</button>
+      <button class="pill" onclick="selPill('support',this,'named')">Named rep, same-day response</button>
+      <button class="pill" onclick="selPill('support',this,'biz-line')">Business support line</button>
+      <button class="pill" onclick="selPill('support',this,'1800')">1-800 consumer line only</button>
+    </div>
+  </div>
+</div>
+
+<div class="card path-b" style="display:none;">
+  <div class="card-header" onclick="tog('s7')">
+    <div class="card-left"><div class="card-num">7</div><div><div class="card-title">Roaming <span class="opt-badge">Optional</span></div><div class="card-sub">International travel and charges</div></div></div>
+    <span class="chevron" id="chev-s7">⌄</span>
+  </div>
+  <div class="card-body" id="body-s7">
+    <div class="info-box"><strong>How roaming affects your score:</strong> More than $32 in roaming over 6 months combined with frequent travel will adjust your grade downward — your plan may not be optimized for travel.</div>
+    <div class="slabel">How often does your team travel outside Canada?</div>
+    <div class="pill-row">
+      <button class="pill sel" onclick="selPill('roam-freq',this,'never')">Never / rarely</button>
+      <button class="pill" onclick="selPill('roam-freq',this,'occasional')">Occasionally (few times/year)</button>
+      <button class="pill" onclick="selPill('roam-freq',this,'regular')">Regularly (monthly)</button>
+      <button class="pill" onclick="selPill('roam-freq',this,'frequent')">Frequently (weekly+)</button>
+    </div>
+    <div class="slabel">Primary travel destinations</div>
+    <div class="pill-row" id="dest-pills">
+      <button class="pill" onclick="togDest(this)">US only</button>
+      <button class="pill" onclick="togDest(this)">US & Mexico</button>
+      <button class="pill" onclick="togDest(this)">Europe / UK</button>
+      <button class="pill" onclick="togDest(this)">Asia-Pacific</button>
+      <button class="pill" onclick="togDest(this)">Latin America</button>
+      <button class="pill" onclick="togDest(this)">Multiple regions</button>
+    </div>
+    <div class="field-row three">
+      <div class="fg"><label>Roaming charges — last 6 months ($)</label><input type="number" id="roam-charges" placeholder="e.g. 85" min="0" oninput="calc()"></div>
+      <div class="fg"><label>Staff who travel regularly (#)</label><input type="number" id="roam-staff" placeholder="e.g. 3" min="0" oninput="calc()"></div>
+      <div class="fg"><label>Travel pattern</label><select id="roam-pattern" onchange="calc()"><option value="">Select</option><option value="scheduled">Scheduled / predictable</option><option value="adhoc">Ad hoc / spontaneous</option><option value="both">Mix of both</option></select></div>
+    </div>
+    <div class="slabel">Travel Pass access</div>
+    <div class="pill-row">
+      <button class="pill sel" onclick="selPill('travelpass',this,'unknown')">I don't know</button>
+      <button class="pill" onclick="yes" onclick="selPill('travelpass',this,'yes')">Yes, we have Travel Pass</button>
+      <button class="pill" onclick="selPill('travelpass',this,'no')">No Travel Pass</button>
